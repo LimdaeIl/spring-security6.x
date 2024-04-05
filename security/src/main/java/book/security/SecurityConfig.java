@@ -18,9 +18,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated()) // 모든 요청 허가
-                .formLogin(Customizer.withDefaults()); // 기본 페이지로 설정
-
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .formLogin(Customizer.withDefaults())
+                .rememberMe(reMemberMe -> reMemberMe
+                        .alwaysRemember(true)
+                        .tokenValiditySeconds(3600)
+                        .userDetailsService(userDetailsService())
+                        .rememberMeParameter("remember")
+                        .rememberMeCookieName("remember")
+                        .key("security")
+                );
         return http.build();
     }
 
@@ -29,13 +36,7 @@ public class SecurityConfig {
         UserDetails user = User.withUsername("user")
                 .password("{noop}1111")
                 .roles("USER").build();
-        UserDetails user1 = User.withUsername("user1")
-                .password("{noop}1111")
-                .roles("USER").build();
-        UserDetails user2 = User.withUsername("user2")
-                .password("{noop}1111")
-                .roles("USER").build();
 
-        return new InMemoryUserDetailsManager(user, user1, user2);
+        return new InMemoryUserDetailsManager(user);
     }
 }
