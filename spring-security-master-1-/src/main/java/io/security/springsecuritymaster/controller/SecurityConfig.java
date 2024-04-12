@@ -1,4 +1,4 @@
-package book.security;
+package io.security.springsecuritymaster.controller;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 @EnableWebSecurity
 @Configuration
@@ -18,14 +17,11 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
-        requestCache.setMatchingRequestParameterName("customParam=y");
-
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/logoutSuccess").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/").permitAll() // 루트만 접근 허용
+                        .anyRequest().authenticated()
+                )
                 .formLogin(Customizer.withDefaults());
 
         return http.build();
@@ -33,9 +29,7 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        UserDetails user = User.withUsername("user")
-                .password("{noop}1111")
-                .roles("USER").build();
+        UserDetails user = User.withUsername("user").password("{noop}1111").roles("USER").build();
 
         return new InMemoryUserDetailsManager(user);
     }
